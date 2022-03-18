@@ -79,3 +79,8 @@ variable "server_name" {
   description = "The name of the server"
   default     = "default"
 }
+variable "dbuserpassword" {
+  type        = string
+  description = "The db2inst1 user password"
+  sensitive   = true
+}

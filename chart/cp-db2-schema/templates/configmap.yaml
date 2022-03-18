@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.ConfigmapName }}
+  labels:
+    app: cp-db2schema
+data:
+  cp_db2schema_setup.sh: |
+    #!/bin/sh
+
+    ############################################################
+    # Adding DB2 users
+    ############################################################
+    useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 omdb && echo omdb:omdb | chpasswd omdb
+    useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 omdb_stat && echo omdb_stat:omdb_stat |  chpasswd omdb_stat
+    useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 omdb_tran && echo omdb_tran:omdb_tran |  chpasswd omdb_tran
+    useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 omdb_mstr && echo omdb_mstr:omdb_mstr |  chpasswd omdb_mstr
+    useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 omdb_conf && echo omdb_conf:omdb_conf |  chpasswd omdb_conf
+
+    ############################################################
+    #  Create DB2 Schema
+    ############################################################
+    db2 create schema OMDB
+    db2 create schema OMDB_CONF
+    db2 create schema OMDB_MSTR
+    db2 create schema OMDB_TRAN
+    db2 create schema OMDB_STAT
+    db2 grant dbadm on database to omdb
+    db2 grant dbadm on database to omdb_stat
+    db2 grant dbadm on database to omdb_tran
+    db2 grant dbadm on database to omdb_mstr
+    db2 grant dbadm on database to omdb_conf

@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.jobName }}
+  #label:
+    #app: db2schema
+spec:
+  template:
+    metadata:
+      name: db2schema-setup-pod
+      annotations:
+        checksum/config-map: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: cp-database-pod
+          image: ibmcom/db2
+          command: ["ibmcom/db2","--privileged=true"]
+          ports:
+            - containerPort: 50000
+              
+          volumeMounts:
+            - mountPath: /db2schemascripts
+              name: db2schemascripts
+          spec:
+            
+          env:
+            - name: LICENSE
+              value: "accept"
+            - name: DB2INST1_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db2inst1-user-details
+                  key: db2inst1_password
+          command:
+            - /bin/sh
+          args:
+            - '-c'
+            - cat /db2scripts/cp_db2_setup.sh && ls -l /db2scripts/ && /db2scripts/cp_db2_setup.sh
+      volumes:
+        - name: db2schemascripts
+          configMap:
+            name: {{ .Values.ConfigmapName }}
+            defaultMode: 0777

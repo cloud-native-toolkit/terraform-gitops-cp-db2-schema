@@ -1,9 +1,11 @@
 locals {
-  name          = "my-module"
+  name          = "cp-db2-schema"
   bin_dir       = module.setup_clis.bin_dir
   yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
   service_url   = "http://${local.name}.${var.namespace}"
   values_content = {
+  jobName = "${local.name}-job" 
+  ConfigmapName = "${local.name}-commands-configmap"
   }
   layer = "services"
   type  = "base"
@@ -24,6 +26,31 @@ resource null_resource create_yaml {
       VALUES_CONTENT = yamlencode(local.values_content)
     }
   }
+}
+
+resource null_resource create_secrets_yaml {
+  depends_on = [null_resource.create_yaml]
+
+  provisioner "local-exec" {
+    command = "${path.module}/scripts/create-secrets.sh '${var.namespace}' '${local.secret_dir}'"
+
+    environment = {
+      BIN_DIR = module.setup_clis.bin_dir
+      DB_USER_PASSWORD = var.dbuserpassword
+      
+    }
+  }
+}
+
+module seal_secrets {
+  depends_on = [null_resource.create_secrets_yaml]
+
+  source = "github.com/cloud-native-toolkit/terraform-util-seal-secrets.git"
+
+  source_dir    = local.secret_dir
+  dest_dir      = "${local.yaml_dir}/templates"
+  kubeseal_cert = var.kubeseal_cert
+  label         = local.name
 }
 
 resource null_resource setup_gitops {
