@@ -1,23 +1,5 @@
 # Starter kit for a Terraform GitOps module
-
-This is a Starter kit to help with the creation of Terraform modules. The basic structure of a Terraform module is fairly
-simple and consists of the following basic values:
-
-- README.md - provides a description of the module
-- main.tf - defines the logic for the module
-- variables.tf (optional) - defines the input variables for the module
-- outputs.tf (optional) - defines the values that are output from the module
-
-Beyond those files, any other content can be added and organized however you see fit. For example, you can add a `scripts/` directory
-that contains shell scripts executed by a `local-exec` `null_resource` in the terraform module. The contents will depend on what your
-module does and how it does it.
-
-## Instructions for creating a new module
-
-1. Update the title and description in the README to match the module you are creating
-2. Fill out the remaining sections in the README template as appropriate
-3. Implement your logic in the in the main.tf, variables.tf, and outputs.tf
-4. Use releases/tags to manage release versions of your module
+Module to provision a gitops repo with the resources to create users and schema on a provisioned DB2 in Cloud Pak for Data.
 
 ## Software dependencies
 
@@ -26,7 +8,7 @@ The module depends on the following software components:
 ### Command-line tools
 
 - terraform - v12
-- kubectl
+- kubectl - used in `scripts/create-secrets.sh` to generate the secret in a yaml file
 
 ### Terraform providers
 
@@ -39,21 +21,27 @@ This module makes use of the output from other modules:
 
 - GitOps - github.com/cloud-native-toolkit/terraform-tools-gitops.git
 - Namespace - github.com/cloud-native-toolkit/terraform-gitops-namespace.git
-- etc
+- gitops_ibm_catalogs - github.com/cloud-native-toolkit/terraform-gitops-cp-catalogs.git
+- gitops_cp4d_operator - github.com/cloud-native-toolkit/terraform-gitops-cp4d-operator.git
+- gitops_db2u_operator - https://github.com/cloud-native-toolkit/terraform-gitops-db2u-operator.git
+- gitops_cp4d_db2oltpservice - https://github.com/cloud-native-toolkit/terraform-gitops-cp-db2-oltp.git
+- gitops_cp4d_db2 - https://github.com/cloud-native-toolkit/terraform-gitops-cp-db2.git
+
+
+
 
 ## Example usage
 
 ```hcl-terraform
-module "dev_tools_argocd" {
-  source = "github.com/cloud-native-toolkit/terraform-tools-argocd.git"
+module "cp-db2-schema" {
+  source = "https://github.com/cloud-native-toolkit/terraform-gitops-cp-db2-schema"
 
-  cluster_config_file = module.dev_cluster.config_file_path
-  cluster_type        = module.dev_cluster.type
-  app_namespace       = module.dev_cluster_namespaces.tools_namespace_name
-  ingress_subdomain   = module.dev_cluster.ingress_hostname
-  olm_namespace       = module.dev_software_olm.olm_namespace
-  operator_namespace  = module.dev_software_olm.target_namespace
-  name                = "argocd"
+  gitops_config = module.gitops.gitops_config
+  git_credentials = module.gitops.git_credentials
+  server_name = module.gitops.server_name
+  namespace = module.gitops_namespace.name
+  kubeseal_cert = module.gitops.sealed_secrets_cert
+  
 }
 ```
 
@@ -227,3 +215,5 @@ The yaml used to define the resources required to deploy the component can be de
 3. If the module has dependencies on other modules, add them as `test/stages/stage1-xxx.tf` and reference the output variables as variable inputs.
 4. Review the validation logic in `.github/scripts/validate-deploy.sh` and update as appropriate.
 5. Push the changes to the remote branch and review the check(s) on the pull request. If the checks fail, review the log and make the necessary adjustments.
+
+For more details on development and contribution,refer to https://github.com/cloud-native-toolkit/automation-modules/tree/main/md

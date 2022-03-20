@@ -25,7 +25,11 @@ versions:
       - id: gitops-db2oltp
         refs:
           - source: https://github.com/cloud-native-toolkit/terraform-gitops-cp-db2-oltp.git
-            version: ">= 1.0.0"      
+            version: ">= 1.0.0"
+      - id: gitops-db2
+        refs:
+          - source: https://github.com/cloud-native-toolkit/terraform-gitops-cp-db2.git
+            version: ">= 1.0.0"     
     variables:
       - name: gitops_config
         moduleRef:

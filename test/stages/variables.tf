@@ -75,3 +75,9 @@ variable "kubeseal_namespace" {
 
 variable "cp_entitlement_key" {
 }
+
+resource null_resource write_namespace {
+  provisioner "local-exec" {
+    command = "echo -n '${var.cpd_namespace}' > .cpd_namespace"
+  }
+}
