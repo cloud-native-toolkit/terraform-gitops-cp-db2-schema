@@ -36,7 +36,7 @@ spec:
             - /bin/sh
           args:
             - '-c'
-            - cat /db2scripts/cp_db2_setup.sh && ls -l /db2scripts/ && /db2scripts/cp_db2_setup.sh
+            - cat /db2schemascripts/cp_db2schema_setup.sh && ls -l /db2schemascripts/ && /db2schemascripts/cp_db2schema_setup.sh
       volumes:
         - name: db2schemascripts
           configMap:
