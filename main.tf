@@ -3,6 +3,7 @@ locals {
   bin_dir       = module.setup_clis.bin_dir
   yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
   service_url   = "http://${local.name}.${var.namespace}"
+  secret_dir    = "${path.cwd}/.tmp/${local.name}/secrets"
   values_content = {
   jobName = "${local.name}-job" 
   ConfigmapName = "${local.name}-commands-configmap"
