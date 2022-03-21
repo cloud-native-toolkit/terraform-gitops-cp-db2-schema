@@ -12,6 +12,7 @@ locals {
   type  = "base"
   application_branch = "main"
   namespace = var.namespace
+  cpd_namespace = var.cpd_namespace
   layer_config = var.gitops_config[local.layer]
 }
 
@@ -33,7 +34,7 @@ resource null_resource create_secrets_yaml {
   depends_on = [null_resource.create_yaml]
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/create-secrets.sh '${var.namespace}' '${local.secret_dir}'"
+    command = "${path.module}/scripts/create-secrets.sh '${var.cpd_namespace}' '${local.secret_dir}'"
 
     environment = {
       BIN_DIR = module.setup_clis.bin_dir
