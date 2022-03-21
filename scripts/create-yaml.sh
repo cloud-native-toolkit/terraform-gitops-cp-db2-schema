@@ -2,7 +2,7 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 MODULE_DIR=$(cd "${SCRIPT_DIR}/.."; pwd -P)
-
+CHART_DIR=$(cd "${SCRIPT_DIR}/../chart/cp-db2-schema"; pwd -P)
 NAME="$1"
 DEST_DIR="$2"
 
