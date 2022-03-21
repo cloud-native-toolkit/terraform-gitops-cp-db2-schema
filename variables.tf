@@ -65,7 +65,7 @@ variable "git_credentials" {
 
 variable "namespace" {
   type        = string
-  description = "The namespace where the application should be deployed"
+  description = "Namespace where cp4d is provisioned and where the db2 is created"
 }
 
 variable "kubeseal_cert" {
@@ -83,4 +83,9 @@ variable "dbuserpassword" {
   type        = string
   description = "The db2inst1 user password"
   sensitive   = true
+}
+variable "cpd_namespace" {
+  type        = string
+  description = "Namespace for cpd services"
+  default = "gitops-cp4d-instance"
 }
