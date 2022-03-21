@@ -7,7 +7,7 @@ NAME="$1"
 DEST_DIR="$2"
 
 mkdir -p "${DEST_DIR}"
-
+chmod -R 755 "${SCRIPT_DIR}"
 ## Add logic here to put the yaml resource content in DEST_DIR
 cp -R "${CHART_DIR}/"* "${DEST_DIR}"
 
