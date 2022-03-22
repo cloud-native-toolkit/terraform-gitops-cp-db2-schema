@@ -59,7 +59,7 @@ until kubectl get job "${JOB}" -n "${NAMESPACE}" || [[ $count -eq 21 ]]; do
 done
 
 if [[ $count -eq 21 ]]; then
-  echo "Timed out waiting for deployment/${JOB} in ${NAMESPACE}"
+  echo "Timed out waiting for job/${JOB} in ${NAMESPACE}"
   kubectl get all -n "${NAMESPACE}"
   exit 1
 fi
