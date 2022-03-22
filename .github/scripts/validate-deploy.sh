@@ -52,19 +52,19 @@ fi
 
 JOB="cp-db2-schema-job"
 count=0
-until kubectl get job "${JOB}" -n "${NAMESPACE}" || [[ $count -eq 20 ]]; do
+until kubectl get job "${JOB}" -n "${NAMESPACE}" || [[ $count -eq 21 ]]; do
   echo "Waiting for job/${JOB} in ${NAMESPACE}"
   count=$((count + 1))
-  sleep 15
+  sleep 45
 done
 
-if [[ $count -eq 20 ]]; then
+if [[ $count -eq 21 ]]; then
   echo "Timed out waiting for deployment/${JOB} in ${NAMESPACE}"
   kubectl get all -n "${NAMESPACE}"
   exit 1
 fi
 
-kubectl wait --for=condition=complete job/${JOB} || exit 1
+kubectl wait --for=condition=complete job/${JOB} -n "${NAMESPACE}" || exit 1
 
 cd ..
 rm -rf .testrepo

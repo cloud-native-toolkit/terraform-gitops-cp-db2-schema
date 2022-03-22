@@ -2,7 +2,7 @@ locals {
   name          = "cp-db2-schema"
   bin_dir       = module.setup_clis.bin_dir
   yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
-  service_url   = "http://${local.name}.${var.namespace}"
+  #service_url   = "http://${local.name}.${var.namespace}"
   secret_dir    = "${path.cwd}/.tmp/${local.name}/secrets"
   values_content = {
   jobName = "${local.name}-job" 
@@ -12,8 +12,8 @@ locals {
   type  = "base"
   application_branch = "main"
   namespace = var.namespace
-  cpd_namespace = var.cpd_namespace
   layer_config = var.gitops_config[local.layer]
+  cpd_namespace = var.cpd_namespace
 }
 
 module setup_clis {
@@ -60,7 +60,7 @@ resource null_resource setup_gitops {
 
   triggers = {
     name = local.name
-    namespace = var.namespace
+    namespace = var.cpd_namespace
     yaml_dir = local.yaml_dir
     server_name = var.server_name
     layer = local.layer
