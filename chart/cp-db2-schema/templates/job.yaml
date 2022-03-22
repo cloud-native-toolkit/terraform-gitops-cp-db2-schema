@@ -18,6 +18,7 @@ spec:
           command: ["ibmcom/db2","--privileged=true"]
           ports:
             - containerPort: 50000
+            - HostPort: 50000
               
           volumeMounts:
             - mountPath: /db2schemascripts
@@ -30,7 +31,7 @@ spec:
             - name: DB2INST1_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: db2inst1-user-details
+                  name: db2inst1-user-credentials
                   key: db2inst1_password
           command:
             - /bin/bash
