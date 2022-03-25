@@ -7,7 +7,8 @@ metadata:
 data:
   cp_db2schema_setup.sh: |
     #!/bin/bash
-
+    
+    id
     ############################################################
     # Adding DB2 users
     ############################################################
@@ -17,9 +18,15 @@ data:
     useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 omdb_mstr && echo omdb_mstr:omdb_mstr |  chpasswd omdb_mstr
     useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 omdb_conf && echo omdb_conf:omdb_conf |  chpasswd omdb_conf
 
+    su - db2inst1
+    id
     ############################################################
     #  Create DB2 Schema
     ############################################################
+    db2 catalog tcpip node prvsndb2 remote ${CPDClusterHost} server ${db2_ssl_port} security SSL 
+    db2 catalog db ${database_name} as omsdbase at node prvsndb2 authentication SERVER_ENCRYPT
+    db2 catalog database ${database_name} at node prvsndb2
+    db2 connect to ${database_name} user ${dbuser} using ${DB2INST1_PASSWORD}
     db2 create schema OMDB
     db2 create schema OMDB_CONF
     db2 create schema OMDB_MSTR

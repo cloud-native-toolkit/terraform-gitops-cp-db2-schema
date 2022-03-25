@@ -26,11 +26,20 @@ spec:
           env:
             - name: LICENSE
               value: "accept"
+            - name: CPDClusterHost
+              value:  {{ .Values.CPDClusterHost }}
+            - name:  db2_ssl_port
+              value: {{ .Values.db2_ssl_port }}
+            - name:  dbuser
+              value: {{ .Values.dbuser }}
+            - name:  database_name
+              value: {{ .Values.database_name }}
             - name: DB2INST1_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: db2inst1-user-credentials
                   key: db2inst1_password
+            
           command:
             - /bin/bash
           args:

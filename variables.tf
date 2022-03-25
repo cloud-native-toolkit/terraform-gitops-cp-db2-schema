@@ -79,13 +79,42 @@ variable "server_name" {
   description = "The name of the server"
   default     = "default"
 }
+
+variable "dbuser" {
+  type        = string
+  description = "The db2inst1 user"
+  default = "db2inst1"
+}
+
 variable "dbuserpassword" {
   type        = string
   description = "The db2inst1 user password"
   sensitive   = true
 }
+
 variable "cpd_namespace" {
   type        = string
   description = "Namespace for cpd services"
   default = "gitops-cp4d-instance"
 }
+
+variable "cp4dclusterhost" {
+  type        = string
+  description = "The service name for cp4d"
+  default     = "https://ibm-nginx-svc"
+}
+
+variable "db2_ssl_port" {
+  type        = number
+  description = " The port number of the Db2 secure sockets layer (SSL) instance"
+  default     = 50001
+}
+
+variable "database_name" {
+  type        = string
+  description = "Name of database created by DB2 instance"
+  default     = "NAME"
+}
+
+
+

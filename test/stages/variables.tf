@@ -82,8 +82,6 @@ variable "cpd_namespace" {
   default = "gitops-cp4d-instance"
 }
 
-
-
 resource null_resource write_namespace {
   provisioner "local-exec" {
     command = "echo -n '${var.cpd_namespace}' > .cpd_namespace"

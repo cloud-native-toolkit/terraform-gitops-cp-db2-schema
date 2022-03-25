@@ -7,6 +7,10 @@ locals {
   values_content = {
   jobName = "${local.name}-job" 
   ConfigmapName = "${local.name}-commands-configmap"
+  CPDClusterHost = var.cp4dclusterhost
+  db2_ssl_port = var.db2_ssl_port
+  dbuser = var.dbuser
+  database_name = var.database_name
   }
   layer = "services"
   type  = "base"
@@ -14,6 +18,7 @@ locals {
   namespace = var.namespace
   layer_config = var.gitops_config[local.layer]
   cpd_namespace = var.cpd_namespace
+  
 }
 
 module setup_clis {
