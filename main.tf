@@ -34,7 +34,7 @@ resource null_resource create_yaml {
     }
   }
 }
-
+#Need to create SA and SCC
 resource null_resource create_secrets_yaml {
   depends_on = [null_resource.create_yaml]
 

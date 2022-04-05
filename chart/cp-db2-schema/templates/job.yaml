@@ -11,25 +11,26 @@ spec:
       annotations:
         checksum/config-map: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
+      serviceAccountName: db2user
       restartPolicy: Never
+                 
+        
       containers:
-        - name: cp-database-pod
+        - name: cp-database-container
+          #image: icr.io/db2u/db2u.tools@sha256:c7662c7d63f4e1b9166e27ba60878bd7d8027ac42fc4cbec2dea3d54cb82abc8
           image: ibmcom/db2
-          command: ["ibmcom/db2","--privileged=true"]
           ports:
             - containerPort: 50000
           volumeMounts:
             - mountPath: /db2schemascripts
-              name: db2schemascripts
-          spec:
-            
+              name: db2schemascripts   
           env:
             - name: LICENSE
               value: "accept"
             - name: CPDClusterHost
               value:  {{ .Values.CPDClusterHost }}
             - name:  db2_ssl_port
-              value: {{ .Values.db2_ssl_port }}
+              value: {{ .Values.db2_ssl_port | quote }}
             - name:  dbuser
               value: {{ .Values.dbuser }}
             - name:  database_name
@@ -39,14 +40,25 @@ spec:
                 secretKeyRef:
                   name: db2inst1-user-credentials
                   key: db2inst1_password
-            
+          #securityContext:
+            #capabilities:
+              #drop:
+                #- KILL
+                #- SETUID
+                #- SETGID
+                #- MKNOD
+                #- ALL
+            #runAsUser: 1000
+            #allowPrivilegeEscalation: false
           command:
-            - /bin/bash
+            - /bin/sh
           args:
-            - '-c'
-            - cat /db2schemascripts/cp_db2schema_setup.sh && ls -l /db2schemascripts/ && /db2schemascripts/cp_db2schema_setup.sh
+            - -c
+            - /db2schemascripts/cp_imageentrypoint.sh 
       volumes:
         - name: db2schemascripts
           configMap:
             name: {{ .Values.ConfigmapName }}
             defaultMode: 0777
+        
+        
