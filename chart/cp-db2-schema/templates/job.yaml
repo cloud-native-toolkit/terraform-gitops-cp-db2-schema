@@ -11,7 +11,7 @@ spec:
       annotations:
         checksum/config-map: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
-      serviceAccountName: db2user
+      serviceAccountName: {{ .Values.sa_name }}
       restartPolicy: Never
                  
         
@@ -27,10 +27,10 @@ spec:
           env:
             - name: LICENSE
               value: "accept"
-            - name: CPDClusterHost
-              value:  {{ .Values.CPDClusterHost }}
-            - name:  db2_ssl_port
-              value: {{ .Values.db2_ssl_port | quote }}
+            - name: DB2Host
+              value:  {{ .Values.DB2Host }}
+            - name:  db2_port
+              value: {{ .Values.db2_port | quote }}
             - name:  dbuser
               value: {{ .Values.dbuser }}
             - name:  database_name

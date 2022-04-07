@@ -5,18 +5,23 @@ metadata:
   labels:
     app: cp-db2schema
 data:
-  cp_image_entrypoint.sh: |
-    #!/bin/sh -x
+  cp_imageentrypoint.sh: |
+    #!/bin/sh
     chmod -R 777 /database/
     mkdir -m  777 /var/custom
-    cp /db2schemascripts/cp_db2schema_setup.sh /var/custom
-    cp /db2schemascripts/cp_addusers_setup.sh /var/custom  
+    cp /db2schemascripts/cp_db2schema_setup.sh /var/custom 
+    cp /db2schemascripts/cp_addusers_setup.sh /var/custom 
+    sed -i '205,209d;' /var/db2_setup/lib/setup_db2_instance.sh
     /var/db2_setup/lib/setup_db2_instance.sh
     ls -l /var/custom
-    /var/custom/cp_addusers_setup.sh
-    /var/custom/cp_db2schema_setup.sh
+    #chown -v db2inst1 /var/custom/cp_db2schema_setup.sh
+    #/var/custom/cp_addusers_setup.sh
+    #/var/custom/cp_db2schema_setup.sh
     id
-    
+    #chmod a+x /var/custom/cp_db2schema_setup.sh
+    #sleep 600
+
+
   cp_addusers_setup.sh: |
     #!/bin/sh -x
     id
@@ -31,21 +36,38 @@ data:
 
   cp_db2schema_setup.sh: |
     #!/bin/sh -x
+    #id
+    #sleep 60
+    #id
+    #. /home/config/db2inst1/sqllib/db2profile
+    # ./database/config/db2inst1/sqllib/db2profile
+    # . /mnt/blumeta0/home/db2inst1/sqllib/db2profile
+    #su - db2inst1
+    # id
+    #uselvl -d /database/config/db2inst1/sqllib/db2profile
+    
     ############################################################
     #  Create DB2 Schema
     ############################################################
-    su - db2inst1 -c 'db2 catalog tcpip node prvsndb2 remote ${CPDClusterHost} server ${db2_ssl_port} security SSL; 
-    db2 catalog db ${database_name} as omsdbase at node prvsndb2 authentication SERVER_ENCRYPT;
-    db2 catalog database ${database_name} at node prvsndb2;
-    db2 connect to ${database_name} user ${dbuser} using ${DB2INST1_PASSWORD};
-    db2 create schema OMDB;
-    db2 create schema OMDB_CONF;
-    db2 create schema OMDB_MSTR;
-    db2 create schema OMDB_TRAN;
-    db2 create schema OMDB_STAT;
-    db2 grant dbadm on database to omdb;
-    db2 grant dbadm on database to omdb_stat;
-    db2 grant dbadm on database to omdb_tran;
-    db2 grant dbadm on database to omdb_mstr;
-    db2 grant dbadm on database to omdb_conf;'
+    
+    # ./database/config/db2inst1/sqllib/db2profile
+    #. $HOME/sqllib/db2profile
+    #db2start
+    su - db2inst1 -c 'db2 catalog tcpip node prvsndb2 remote "'"${DB2Host}"'" server "'"${db2_port}"'"; 
+    db2 catalog db NAME as "'"${database_name}"'" at node prvsndb2;
+    db2 connect to "'"${database_name}"'" user db2inst1 using "'"${DB2INST1_PASSWORD}"'";
+    db2 create schema omdb;
+    db2 create schema omdb_conf;
+    db2 create schema omdb_mstr;
+    db2 create schema omdb_tran;
+    db2 create schema omdb_stat;
+    db2 grant dbadm on database to user omdb;
+    db2 grant dbadm on database to user omdb_conf;
+    db2 grant dbadm on database to user omdb_stat;
+    db2 grant dbadm on database to user omdb_tran;
+    db2 grant dbadm on database to user omdb_mstr;' 
+    exit
+    #db2stop
+    #db2start
+    #db2
     

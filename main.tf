@@ -4,13 +4,14 @@ locals {
   yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
   #service_url   = "http://${local.name}.${var.namespace}"
   secret_dir    = "${path.cwd}/.tmp/${local.name}/secrets"
+  sa_name = var.sa_name
   values_content = {
   jobName = "${local.name}-job" 
   ConfigmapName = "${local.name}-commands-configmap"
-  CPDClusterHost = var.cp4dclusterhost
-  db2_ssl_port = var.db2_ssl_port
-  dbuser = var.dbuser
+  DB2Host = var.DB2Host
+  db2_port = var.db2_port
   database_name = var.database_name
+  sa_name = local.sa_name
   }
   layer = "services"
   type  = "base"
@@ -34,7 +35,17 @@ resource null_resource create_yaml {
     }
   }
 }
-#Need to create SA and SCC
+module "service_account" {
+  source = "github.com/cloud-native-toolkit/terraform-gitops-service-account.git"
+
+  gitops_config = var.gitops_config
+  git_credentials = var.git_credentials
+  namespace = var.namespace
+  name = local.sa_name
+  sccs = ["anyuid", "privileged"]
+  server_name = var.server_name
+}
+
 resource null_resource create_secrets_yaml {
   depends_on = [null_resource.create_yaml]
 
