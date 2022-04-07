@@ -6,6 +6,6 @@ module "gitops_module" {
   server_name = module.gitops.server_name
   namespace = var.cpd_namespace
   kubeseal_cert = module.gitops.sealed_secrets_cert
-  dbuserpassword = "db2inst1pwd"
+  dbuserpassword = "db2password"
   #dbname = module.db2.database_name
 }

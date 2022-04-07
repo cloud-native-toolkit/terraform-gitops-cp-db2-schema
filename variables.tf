@@ -95,7 +95,7 @@ variable "cpd_namespace" {
 variable "DB2Host" {
   type        = string
   description = "The service name for cp4d"
-  default     = "https://ibm-nginx-svc"
+  default     = "c-db2oltp-140510034250142850024-db2u-engn-svc"
 }
 
 variable "db2_port" {
