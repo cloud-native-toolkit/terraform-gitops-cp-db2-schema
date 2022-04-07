@@ -40,7 +40,7 @@ module "service_account" {
 
   gitops_config = var.gitops_config
   git_credentials = var.git_credentials
-  namespace = var.namespace
+  namespace = var.cpd_namespace
   name = local.sa_name
   sccs = ["anyuid", "privileged"]
   server_name = var.server_name
