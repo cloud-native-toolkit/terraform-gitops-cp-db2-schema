@@ -72,7 +72,7 @@ module seal_secrets {
 }
 
 resource null_resource setup_gitops {
-  depends_on = [null_resource.create_yaml]
+  depends_on = [null_resource.create_yaml,module.service_account]
 
   triggers = {
     name = local.name
