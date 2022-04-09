@@ -107,13 +107,13 @@ variable "db2_port" {
 variable "database_name" {
   type        = string
   description = "Name of database created by DB2 instance"
-  default     = "NAME"
+  default     = "OMSDB"
 }
 
 variable "sa_name" {
   type        = string
   description = "Name of service account to be created for job"
-  default     = "db2cliuser"
+  default     = "db2user"
 }
 
 
