@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "db2-schema.fullname" . }}
+  labels:
+  {{- include "db2-schema.labels" . | nindent 4 }}
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ include "db2-schema.fullname" . }}
+            defaultMode: 0777
+      serviceAccountName: {{ include "db2-schema.serviceAccountName" . }}
+      containers:
+        - name: job
+          image: {{ printf "%s:%s" .Values.image.repository (include "db2-schema.imageTag" .) | quote }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /scripts
+              name: scripts
+          env:
+            - name: SCHEMAS
+              value: {{ join ";" .Values.schemas }}
+          envFrom:
+            - secretRef:
+                name: {{ default "db2-credentials" .Values.secret.name }}
+              prefix: DATABASE_
+          command:
+            - /scripts/entrypoint.sh

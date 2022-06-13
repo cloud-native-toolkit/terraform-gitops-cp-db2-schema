@@ -1,0 +1,4 @@
+  {{- if .Values.customScript }}
+  custom_script.sh: |
+    {{ .Values.customScript }}
+  {{- end }}

@@ -65,7 +65,7 @@ variable "git_credentials" {
 
 variable "namespace" {
   type        = string
-  description = "Namespace where cp4d is provisioned and where the db2 is created"
+  description = "Namespace where the job will be deployed"
 }
 
 variable "kubeseal_cert" {
@@ -80,41 +80,47 @@ variable "server_name" {
   default     = "default"
 }
 
-variable "dbuserpassword" {
+variable "database_username" {
   type        = string
-  description = "The db2inst1 user password"
+  description = "The username for the database instance"
+}
+
+variable "database_password" {
+  type        = string
+  description = "The password for the database instance"
   sensitive   = true
 }
 
-variable "cpd_namespace" {
+variable "database_host" {
   type        = string
-  description = "Namespace for cpd services"
-  default = "gitops-cp4d-instance"
+  description = "The host for the database instance"
 }
 
-variable "DB2Host" {
-  type        = string
-  description = "The service name for cp4d"
-  default     = "c-db2oltp-140510034250142850024-db2u-engn-svc"
-}
-
-variable "db2_port" {
+variable "database_port" {
   type        = number
-  description = " The port number of the Db2 secure sockets layer (SSL) instance"
+  description = " The port number of the database secure sockets layer (SSL)"
   default     = 50000
 }
 
 variable "database_name" {
   type        = string
-  description = "Name of database created by DB2 instance"
-  default     = "OMSDB"
+  description = "Name of database created for instance"
 }
 
-variable "sa_name" {
+variable "schemas" {
+  type        = list(string)
+  description = "The list of schemas that should be added to the database"
+  default     = []
+}
+
+variable "customScriptFile" {
   type        = string
-  description = "Name of service account to be created for job"
-  default     = "db2user"
+  description = "The path to the file containing the custom script that should be run against the database. The script can either be provided in a file or as a string in the `customScript` variable."
+  default     = ""
 }
 
-
-
+variable "customScript" {
+  type        = string
+  description = "The contents of the custom script that should be run against the database. The script can either be provided as a string or in a file via the `customScriptFile` variable."
+  default     = ""
+}

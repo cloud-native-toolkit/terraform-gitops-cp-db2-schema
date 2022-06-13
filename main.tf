@@ -1,29 +1,32 @@
 locals {
-  name          = "cp-db2-schema"
+  name          = "db2-schema"
   bin_dir       = module.setup_clis.bin_dir
   yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
-  #service_url   = "http://${local.name}.${var.namespace}"
   secret_dir    = "${path.cwd}/.tmp/${local.name}/secrets"
-  sa_name = var.sa_name
+  sa_name = "db2-schema"
+  secret_name = "db2-credentials"
+  custom_script = var.customScriptFile != "" ? file(var.customScriptFile) : var.customScript
   values_content = {
-  jobName = "${local.name}-job" 
-  ConfigmapName = "${local.name}-commands-configmap"
-  DB2Host = var.DB2Host
-  db2_port = var.db2_port
-  database_name = var.database_name
-  sa_name = local.sa_name
+    serviceAccount = {
+      create = false
+      name = local.sa_name
+    }
+    secret = {
+      create = false
+      name = local.secret_name
+    }
+    customScript = local.custom_script
   }
   layer = "services"
   type  = "base"
   application_branch = "main"
   namespace = var.namespace
   layer_config = var.gitops_config[local.layer]
-  cpd_namespace = var.cpd_namespace
-  
 }
 
 module setup_clis {
-  source = "github.com/cloud-native-toolkit/terraform-util-clis.git"
+  source = "cloud-native-toolkit/clis/util"
+  version = "1.16.1"
 }
 
 resource null_resource create_yaml {
@@ -35,27 +38,31 @@ resource null_resource create_yaml {
     }
   }
 }
+
 module "service_account" {
   source = "github.com/cloud-native-toolkit/terraform-gitops-service-account.git"
 
   gitops_config = var.gitops_config
   git_credentials = var.git_credentials
-  namespace = var.cpd_namespace
+  server_name = var.server_name
+  namespace = var.namespace
   name = local.sa_name
   sccs = ["anyuid", "privileged"]
-  server_name = var.server_name
 }
 
 resource null_resource create_secrets_yaml {
   depends_on = [null_resource.create_yaml]
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/create-secrets.sh '${var.cpd_namespace}' '${local.secret_dir}'"
+    command = "${path.module}/scripts/create-secrets.sh '${var.namespace}' '${local.secret_name}' '${local.secret_dir}'"
 
     environment = {
       BIN_DIR = module.setup_clis.bin_dir
-      DB_USER_PASSWORD = var.dbuserpassword
-      
+      DATABASE_PASSWORD = var.database_password
+      DATABASE_USERNAME = var.database_username
+      DATABASE_HOST = var.database_host
+      DATABASE_PORT = var.database_port
+      DATABASE_NAME = var.database_name
     }
   }
 }
@@ -76,7 +83,7 @@ resource null_resource setup_gitops {
 
   triggers = {
     name = local.name
-    namespace = var.cpd_namespace
+    namespace = var.namespace
     yaml_dir = local.yaml_dir
     server_name = var.server_name
     layer = local.layer
