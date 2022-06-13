@@ -1,4 +1,4 @@
   {{- if .Values.customScript }}
   custom_script.sh: |
-    {{ .Values.customScript }}
+    {{- .Values.customScript | nindent 4 }}
   {{- end }}

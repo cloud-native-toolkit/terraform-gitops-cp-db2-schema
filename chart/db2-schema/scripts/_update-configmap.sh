@@ -9,6 +9,7 @@ cat "${SUPPORT_DIR}/configmap.presnippet.yaml" > "${TEMPLATE_DIR}/configmap.yaml
 oc create configmap tmp \
   --from-file=${SCRIPT_DIR}/entrypoint.sh \
   --from-file=${SCRIPT_DIR}/create_schemas.sh \
+  --from-file=${SCRIPT_DIR}/run_script.sh \
   --dry-run=client \
   -o yaml | \
 yq eval 'del(.apiVersion) | del(.kind) | del(.metadata)' - >> "${TEMPLATE_DIR}/configmap.yaml"
