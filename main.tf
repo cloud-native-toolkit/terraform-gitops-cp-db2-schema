@@ -50,34 +50,6 @@ module "service_account" {
   sccs = ["anyuid", "privileged"]
 }
 
-resource null_resource create_secrets_yaml {
-  depends_on = [null_resource.create_yaml]
-
-  provisioner "local-exec" {
-    command = "${path.module}/scripts/create-secrets.sh '${var.namespace}' '${local.secret_name}' '${local.secret_dir}'"
-
-    environment = {
-      BIN_DIR = module.setup_clis.bin_dir
-      DATABASE_PASSWORD = var.database_password
-      DATABASE_USERNAME = var.database_username
-      DATABASE_HOST = var.database_host
-      DATABASE_PORT = var.database_port
-      DATABASE_NAME = var.database_name
-    }
-  }
-}
-
-module seal_secrets {
-  depends_on = [null_resource.create_secrets_yaml]
-
-  source = "github.com/cloud-native-toolkit/terraform-util-seal-secrets.git"
-
-  source_dir    = local.secret_dir
-  dest_dir      = "${local.yaml_dir}/templates"
-  kubeseal_cert = var.kubeseal_cert
-  label         = local.name
-}
-
 resource null_resource setup_gitops {
   depends_on = [null_resource.create_yaml,module.service_account]
 
