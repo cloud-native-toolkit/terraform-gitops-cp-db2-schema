@@ -2,6 +2,9 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
+BIN_DIR=$(cat .bin_dir)
+export PATH="${BIN_DIR}:${PATH}"
+
 source "${SCRIPT_DIR}/validation-functions.sh"
 
 GIT_REPO=$(cat git_repo)
