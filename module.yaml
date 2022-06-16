@@ -50,7 +50,7 @@ versions:
         moduleRef:
           id: database-secret
           output: port_key
-      - name: database_key
+      - name: database_name_key
         moduleRef:
           id: database-secret
           output: database_key
