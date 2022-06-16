@@ -2,7 +2,13 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 MODULE_DIR=$(cd "${SCRIPT_DIR}/.."; pwd -P)
-CHART_DIR=$(cd "${SCRIPT_DIR}/../chart/cp-db2-schema"; pwd -P)
+CHART_DIR=$(cd "${MODULE_DIR}/chart/db2-schema"; pwd -P)
+
+if [[ ! -d "${CHART_DIR}" ]]; then
+  echo "Chart dir not found: ${CHART_DIR}" >&2
+  exit 1
+fi
+
 NAME="$1"
 DEST_DIR="$2"
 
