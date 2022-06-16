@@ -106,3 +106,13 @@ resource null_resource write_namespace {
   }
 
 }
+
+variable "region" {
+  default = "us-south"
+}
+
+variable "resource_group_name" {
+}
+
+variable "ibmcloud_api_key" {
+}

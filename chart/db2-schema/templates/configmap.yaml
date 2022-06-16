@@ -6,7 +6,7 @@ metadata:
     {{- include "db2-schema.labels" . | nindent 4 }}
 data:
   create_schemas.sh: |
-    #!/usr/bin/env bash
+    #!/usr/bin/env sh
 
     if [[ -z "${SCHEMAS}" ]]; then
       echo "No schemas provided. Exiting..."
@@ -33,71 +33,39 @@ data:
     require_env_var "DATABASE_USERNAME"
     require_env_var "DATABASE_PASSWORD"
 
-    SCHEMA_FILE="/tmp/schema.db2"
-
-    cat > "${SCHEMA_FILE}" << EOM
-    db2 catalog tcpip node prvsndb2 remote "'"${DATABASE_HOST}"'" server "'"${DATABASE_PORT}"'";
-    db2 catalog db NAME as "'"${DATABASE_DATABASE}"'" at node prvsndb2;
-    db2 connect to "'"${DATABASE_DATABASE}"'" user "'"${DATABASE_USERNAME}"'" using "'"${DATABASE_PASSWORD}"'";
-    EOM
+    SCHEMA_FILE="/tmp/db2-schema.sql"
 
     SCHEMA_LIST=$(echo "${SCHEMAS}" | tr ";" "\n")
 
     for schema in $SCHEMA_LIST; do
-      useradd -NM -d / -f -1 -s /sbin/nologin -K UID_MIN=2000 "${schema}" && echo "${schema}:${schema}" | chpasswd "${schema}"
-
-      echo "db2 create schema ${schema};" >> "${SCHEMA_FILE}"
-      echo "db2 grant dbadm on database to user ${schema};" >> "${SCHEMA_FILE}"
+      echo "create schema '${schema}';" >> "${SCHEMA_FILE}"
+      echo "grant dbadm on database to user '${schema}';" >> "${SCHEMA_FILE}"
     done
+
+    db2 -tf "${SCHEMA_FILE}"
   entrypoint.sh: |
-    #!/usr/bin/env bash
+    #!/usr/bin/env sh
 
     SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-    #!/bin/sh
     /var/db2_setup/lib/setup_db2_instance.sh &
 
-    ${SCRIPT_DIR}/create_schemas.sh
-    ${SCRIPT_DIR}/run_script.sh
+    sleep 300
+
+    "${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
+    "${SCRIPT_DIR}/create_schemas.sh"
+    "${SCRIPT_DIR}/run_script.sh"
   run_script.sh: |
-    #!/usr/bin/env bash
+    #!/usr/bin/env sh
 
     SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-    if [[ ! -f "${SCRIPT_DIR}/custom_script.sh" ]]; then
+    if [ ! -f "${SCRIPT_DIR}/custom_script.sh" ]; then
       echo "No custom script provided. Exiting..."
       exit 0
     fi
 
-    require_env_var() {
-      local var_name="$1"
-
-      if [[ -z "${var_name}" ]]; then
-        echo "The variable name must be provided" >&2
-        exit 1
-      fi
-
-      if [[ -z "${!var_name}" ]]; then
-        echo "${var_name} must be provided as an environment variable" >&2
-        exit 1
-      fi
-    }
-
-    require_env_var "DATABASE_HOST"
-    require_env_var "DATABASE_PORT"
-    require_env_var "DATABASE_DATABASE"
-    require_env_var "DATABASE_USERNAME"
-    require_env_var "DATABASE_PASSWORD"
-
-    SCHEMA_FILE="/tmp/schema.db2"
-
-    cat > "${SCHEMA_FILE}" << EOM
-    db2 catalog tcpip node prvsndb2 remote "'"${DATABASE_HOST}"'" server "'"${DATABASE_PORT}"'";
-    db2 catalog db NAME as "'"${DATABASE_DATABASE}"'" at node prvsndb2;
-    db2 connect to "'"${DATABASE_DATABASE}"'" user "'"${DATABASE_USERNAME}"'" using "'"${DATABASE_PASSWORD}"'";
-    EOM
-
-    "${SCRIPT_DIR}/custom_script.sh"
+    "${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}"
   {{- if .Values.customScript }}
   custom_script.sh: |
     {{- .Values.customScript | nindent 4 }}

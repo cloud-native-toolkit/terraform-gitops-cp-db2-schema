@@ -26,9 +26,30 @@ spec:
           env:
             - name: SCHEMAS
               value: {{ join ";" .Values.schemas }}
-          envFrom:
-            - secretRef:
-                name: {{ default "db2-credentials" .Values.secret.name }}
-              prefix: DATABASE_
+            - name: DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{- default "host" .Values.secret.host_key }}
+            - name: DATABASE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{- default "port" .Values.secret.port_key }}
+            - name: DATABASE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{- default "database" .Values.secret.database_key }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{- default "username" .Values.secret.username_key }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{- default "password" .Values.secret.password_key }}
           command:
             - /scripts/entrypoint.sh

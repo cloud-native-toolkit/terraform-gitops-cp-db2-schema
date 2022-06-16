@@ -63,11 +63,6 @@ variable "git_credentials" {
   sensitive   = true
 }
 
-variable "namespace" {
-  type        = string
-  description = "Namespace where the job will be deployed"
-}
-
 variable "kubeseal_cert" {
   type        = string
   description = "The certificate/public key used to encrypt the sealed secrets"
@@ -80,31 +75,44 @@ variable "server_name" {
   default     = "default"
 }
 
-variable "database_username" {
+variable "namespace" {
   type        = string
-  description = "The username for the database instance"
+  description = "Namespace where the database secret has been provisioned"
 }
 
-variable "database_password" {
+variable "secret_name" {
   type        = string
-  description = "The password for the database instance"
-  sensitive   = true
+  description = "The name of the secret that contains the credentials for the database"
 }
 
-variable "database_host" {
+variable "username_key" {
   type        = string
-  description = "The host for the database instance"
+  description = "The key in the provided secret used for the username"
+  default     = "username"
 }
 
-variable "database_port" {
-  type        = number
-  description = " The port number of the database secure sockets layer (SSL)"
-  default     = 50000
+variable "password_key" {
+  type        = string
+  description = "The key in the provided secret used for the password"
+  default     = "password"
 }
 
-variable "database_name" {
+variable "host_key" {
   type        = string
-  description = "Name of database created for instance"
+  description = "The key in the provided secret used for the host"
+  default     = "host"
+}
+
+variable "port_key" {
+  type        = string
+  description = "The key in the provided secret used for the port"
+  default     = "port"
+}
+
+variable "database_name_key" {
+  type        = string
+  description = "The key in the provided secret used for the database name"
+  default     = "database"
 }
 
 variable "schemas" {

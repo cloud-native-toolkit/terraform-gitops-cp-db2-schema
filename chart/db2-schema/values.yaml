@@ -18,13 +18,19 @@ serviceAccount:
   name: ""
 
 secret:
-  create: true
+  create: false
   name: "db2-credentials"
   host: ""
   port: ""
   database: ""
   username: ""
   password: ""
+  host_key: "host"
+  port_key: "port"
+  username_key: "username"
+  password_key: "password"
+  database_key: "database"
+
 
 schemas: []
 
