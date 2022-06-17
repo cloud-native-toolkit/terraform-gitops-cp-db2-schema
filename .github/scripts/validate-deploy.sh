@@ -30,7 +30,7 @@ validate_gitops_content "${NAMESPACE}" "${LAYER}" "${SERVER_NAME}" "${TYPE}" "${
 
 check_k8s_namespace "${NAMESPACE}"
 
-check_k8s_resource "${NAMESPACE}" job db2-schema-job
+check_k8s_resource "${NAMESPACE}" job db2-schema
 
 sleep 300
 
