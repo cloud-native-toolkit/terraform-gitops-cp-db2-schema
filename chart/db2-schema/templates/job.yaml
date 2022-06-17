@@ -24,6 +24,8 @@ spec:
             - mountPath: /scripts
               name: scripts
           env:
+            - name: LICENSE
+              value: accept
             - name: SCHEMAS
               value: {{ join ";" .Values.schemas }}
             - name: DATABASE_HOST
