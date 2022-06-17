@@ -29,6 +29,8 @@ SCHEMA_FILE="/tmp/db2-schema.sql"
 
 SCHEMA_LIST=$(echo "${SCHEMAS}" | tr ";" "\n")
 
+source /database/config/db2inst1/sqllib/db2profile
+
 for schema in $SCHEMA_LIST; do
   echo "create schema '${schema}';" >> "${SCHEMA_FILE}"
   echo "grant dbadm on database to user '${schema}';" >> "${SCHEMA_FILE}"

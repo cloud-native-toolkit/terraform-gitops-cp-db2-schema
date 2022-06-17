@@ -37,6 +37,8 @@ data:
 
     SCHEMA_LIST=$(echo "${SCHEMAS}" | tr ";" "\n")
 
+    source /database/config/db2inst1/sqllib/db2profile
+
     for schema in $SCHEMA_LIST; do
       echo "create schema '${schema}';" >> "${SCHEMA_FILE}"
       echo "grant dbadm on database to user '${schema}';" >> "${SCHEMA_FILE}"
@@ -50,7 +52,7 @@ data:
 
     /var/db2_setup/lib/setup_db2_instance.sh &
 
-    sleep 300
+    sleep 360
 
     "${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
     "${SCRIPT_DIR}/create_schemas.sh"
@@ -64,6 +66,8 @@ data:
       echo "No custom script provided. Exiting..."
       exit 0
     fi
+
+    source /database/config/db2inst1/sqllib/db2profile
 
     "${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}"
   {{- if .Values.customScript }}

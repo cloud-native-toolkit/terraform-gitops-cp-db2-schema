@@ -7,4 +7,6 @@ if [ ! -f "${SCRIPT_DIR}/custom_script.sh" ]; then
   exit 0
 fi
 
+source /database/config/db2inst1/sqllib/db2profile
+
 "${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}"
