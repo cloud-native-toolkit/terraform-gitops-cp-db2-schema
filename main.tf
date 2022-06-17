@@ -26,6 +26,8 @@ locals {
 module setup_clis {
   source = "cloud-native-toolkit/clis/util"
   version = "1.16.1"
+
+  clis = ["igc", "jq", "yq"]
 }
 
 resource null_resource create_yaml {
@@ -33,6 +35,7 @@ resource null_resource create_yaml {
     command = "${path.module}/scripts/create-yaml.sh '${local.name}' '${local.yaml_dir}'"
 
     environment = {
+      BIN_DIR = module.setup_clis.bin_dir
       VALUES_CONTENT = yamlencode(local.values_content)
     }
   }
