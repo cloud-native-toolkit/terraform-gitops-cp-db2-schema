@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
 /var/db2_setup/lib/setup_db2_instance.sh &
 
-sleep 500
+sleep 300
 
 set -e
 
