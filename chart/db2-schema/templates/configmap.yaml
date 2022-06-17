@@ -5,6 +5,22 @@ metadata:
   labels:
     {{- include "db2-schema.labels" . | nindent 4 }}
 data:
+  connect_remote_database.sh: |
+    #!/usr/bin/env sh
+
+    DATABASE_HOST="$1"
+    DATABASE_PORT="$2"
+    DATABASE_DATABASE="$3"
+    DATABASE_USERNAME="$4"
+    DATABASE_PASSWORD="$5"
+
+    set -e
+
+    source /database/config/db2inst1/sqllib/db2profile
+
+    db2 catalog tcpip node prvsndb2 remote "${DATABASE_HOST}" server "${DATABASE_PORT}";
+    db2 catalog db NAME as "${DATABASE_DATABASE}" at node prvsndb2;
+    db2 connect to "${DATABASE_DATABASE}" user "${DATABASE_USERNAME}" using "${DATABASE_PASSWORD}";
   create_schemas.sh: |
     #!/usr/bin/env sh
 
@@ -52,7 +68,9 @@ data:
 
     /var/db2_setup/lib/setup_db2_instance.sh &
 
-    sleep 360
+    sleep 500
+
+    set -e
 
     "${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
     "${SCRIPT_DIR}/create_schemas.sh"
@@ -66,6 +84,8 @@ data:
       echo "No custom script provided. Exiting..."
       exit 0
     fi
+
+    set -e
 
     source /database/config/db2inst1/sqllib/db2profile
 
