@@ -4,7 +4,14 @@ SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
 /var/db2_setup/lib/setup_db2_instance.sh &
 
-sleep 240
+count=0
+while [ "${count}" -lt 4 ]; do
+  echo "Sleeping for 60 seconds"
+  count=$((count + 1))
+  sleep 60
+done
+
+echo "Done sleeping"
 
 set -e
 

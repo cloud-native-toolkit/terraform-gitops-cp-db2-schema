@@ -75,7 +75,18 @@ check_k8s_resource () {
     kubectl logs "job/${NAME}" -f -n "${NS}" &
 
     echo "Waiting for job to complete: ${NAME}"
-    kubectl wait --for=condition=complete "job/${NAME}" --timeout=30m -n "${NS}" || exit 1
+    # wait for completion as background process - capture PID
+    kubectl wait --for=condition=complete "job/${NAME}" --timeout=30m -n "${NS}" &
+    completion_pid=$!
+
+    # wait for failure as background process - capture PID
+    kubectl wait --for=condition=failed "job/${NAME}" --timeout=30m -n "${NS}" && exit 1 &
+    failure_pid=$!
+
+    if ! wait -n $completion_pid $failure_pid; then
+      echo "Job failed" >&2
+      exit 1
+    fi
   fi
 
   echo "Done checking for resource: ${NS}/${GITOPS_TYPE}/${NAME}"
