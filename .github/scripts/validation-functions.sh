@@ -78,7 +78,7 @@ check_k8s_resource () {
     kubectl logs "job/${NAME}" -f -n "${NS}" &
 
     echo "Waiting for job to complete: ${NAME}"
-    kubectl wait --for=condition=complete "job/${NAME}" -n "${NS}" || exit 1
+    kubectl wait --for=condition=complete "job/${NAME}" --timeout=30m -n "${NS}" || exit 1
   fi
 
   echo "Done checking for resource: ${NS}/${GITOPS_TYPE}/${NAME}"
