@@ -16,7 +16,9 @@ data:
 
     set -e
 
-    source /database/config/db2inst1/sqllib/db2profile
+    whoami
+
+    echo "Creating connection to database: ${DATABASE_DATABASE}"
 
     db2 catalog tcpip node prvsndb2 remote "${DATABASE_HOST}" server "${DATABASE_PORT}";
     db2 catalog db NAME as "${DATABASE_DATABASE}" at node prvsndb2;
@@ -53,7 +55,9 @@ data:
 
     SCHEMA_LIST=$(echo "${SCHEMAS}" | tr ";" "\n")
 
-    source /database/config/db2inst1/sqllib/db2profile
+    whoami
+
+    echo "Creating schema(s) in database: ${DATABASE_DATABASE}"
 
     for schema in $SCHEMA_LIST; do
       echo "create schema '${schema}';" >> "${SCHEMA_FILE}"
@@ -68,9 +72,11 @@ data:
 
     /var/db2_setup/lib/setup_db2_instance.sh &
 
-    sleep 300
+    sleep 240
 
     set -e
+
+    su - db2inst1
 
     "${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
     "${SCRIPT_DIR}/create_schemas.sh"
@@ -87,7 +93,9 @@ data:
 
     set -e
 
-    source /database/config/db2inst1/sqllib/db2profile
+    whoami
+
+    echo "Executing custom script in database: ${DATABASE_DATABASE}"
 
     "${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}"
   {{- if .Values.customScript }}

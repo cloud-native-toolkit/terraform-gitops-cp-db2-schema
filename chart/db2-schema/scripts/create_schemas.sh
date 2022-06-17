@@ -29,7 +29,9 @@ SCHEMA_FILE="/tmp/db2-schema.sql"
 
 SCHEMA_LIST=$(echo "${SCHEMAS}" | tr ";" "\n")
 
-source /database/config/db2inst1/sqllib/db2profile
+whoami
+
+echo "Creating schema(s) in database: ${DATABASE_DATABASE}"
 
 for schema in $SCHEMA_LIST; do
   echo "create schema '${schema}';" >> "${SCHEMA_FILE}"

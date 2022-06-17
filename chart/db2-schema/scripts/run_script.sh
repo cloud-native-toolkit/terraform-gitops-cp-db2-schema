@@ -9,6 +9,8 @@ fi
 
 set -e
 
-source /database/config/db2inst1/sqllib/db2profile
+whoami
+
+echo "Executing custom script in database: ${DATABASE_DATABASE}"
 
 "${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}"

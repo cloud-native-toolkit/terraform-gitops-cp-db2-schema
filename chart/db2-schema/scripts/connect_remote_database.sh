@@ -8,7 +8,9 @@ DATABASE_PASSWORD="$5"
 
 set -e
 
-source /database/config/db2inst1/sqllib/db2profile
+whoami
+
+echo "Creating connection to database: ${DATABASE_DATABASE}"
 
 db2 catalog tcpip node prvsndb2 remote "${DATABASE_HOST}" server "${DATABASE_PORT}";
 db2 catalog db NAME as "${DATABASE_DATABASE}" at node prvsndb2;
