@@ -71,10 +71,13 @@ check_k8s_resource () {
   if [[ "${GITOPS_TYPE}" =~ deployment|statefulset|daemonset ]]; then
     kubectl rollout status "${GITOPS_TYPE}" "${NAME}" -n "${NS}" || exit 1
   elif [[ "${GITOPS_TYPE}" == "job" ]]; then
+    echo "Waiting for job to be ready: ${NAME}"
     kubectl wait --for=condition=Ready "job/${NAME}" -n "${NS}"
 
+    echo "Tailing job logs: ${NAME}"
     kubectl logs "job/${NAME}" -f -n "${NS}" &
 
+    echo "Waiting for job to complete: ${NAME}"
     kubectl wait --for=condition=complete "job/${NAME}" -n "${NS}" || exit 1
   fi
 
