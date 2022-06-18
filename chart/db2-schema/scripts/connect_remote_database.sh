@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 DATABASE_HOST="$1"
 DATABASE_PORT="$2"
@@ -8,9 +8,10 @@ DATABASE_PASSWORD="$5"
 
 set -e
 
+echo -n "** Running as "
 whoami
 
-echo "Creating connection to database: ${DATABASE_DATABASE}"
+echo "Creating connection to database: name=${DATABASE_DATABASE}, ${DATABASE_HOST}:${DATABASE_PORT}"
 
 db2 catalog tcpip node prvsndb2 remote "${DATABASE_HOST}" server "${DATABASE_PORT}";
 db2 catalog db NAME as "${DATABASE_DATABASE}" at node prvsndb2;

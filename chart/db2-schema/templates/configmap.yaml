@@ -6,7 +6,7 @@ metadata:
     {{- include "db2-schema.labels" . | nindent 4 }}
 data:
   connect_remote_database.sh: |
-    #!/usr/bin/env sh
+    #!/usr/bin/env bash
 
     DATABASE_HOST="$1"
     DATABASE_PORT="$2"
@@ -16,15 +16,16 @@ data:
 
     set -e
 
+    echo -n "** Running as "
     whoami
 
-    echo "Creating connection to database: ${DATABASE_DATABASE}"
+    echo "Creating connection to database: name=${DATABASE_DATABASE}, ${DATABASE_HOST}:${DATABASE_PORT}"
 
     db2 catalog tcpip node prvsndb2 remote "${DATABASE_HOST}" server "${DATABASE_PORT}";
     db2 catalog db NAME as "${DATABASE_DATABASE}" at node prvsndb2;
     db2 connect to "${DATABASE_DATABASE}" user "${DATABASE_USERNAME}" using "${DATABASE_PASSWORD}";
   create_schemas.sh: |
-    #!/usr/bin/env sh
+    #!/usr/bin/env bash
 
     if [[ -z "${SCHEMAS}" ]]; then
       echo "No schemas provided. Exiting..."
@@ -55,6 +56,7 @@ data:
 
     SCHEMA_LIST=$(echo "${SCHEMAS}" | tr ";" "\n")
 
+    echo -n "** Running as "
     whoami
 
     echo "Creating schema(s) in database: ${DATABASE_DATABASE}"
@@ -66,20 +68,27 @@ data:
 
     db2 -tf "${SCHEMA_FILE}"
   entrypoint.sh: |
-    #!/usr/bin/env sh
+    #!/usr/bin/env bash
 
     SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
+
+    dnf install procps -y
 
     /var/db2_setup/lib/setup_db2_instance.sh &
 
     count=0
-    while [ "${count}" -lt 4 ]; do
+    while [[ "${count}" -lt 6 ]]; do
+      if [[ $(pgrep -f -c db2sysc) -gt 0 ]]; then
+        echo "db2sysc process started"
+        break
+      fi
+
       echo "Sleeping for 60 seconds"
       count=$((count + 1))
       sleep 60
     done
 
-    echo "Done sleeping"
+    echo "DB2 is ready. Running commands..."
 
     set -e
 
@@ -87,17 +96,18 @@ data:
     su - db2inst1 -c "${SCRIPT_DIR}/create_schemas.sh"
     su - db2inst1 -c "${SCRIPT_DIR}/run_script.sh"
   run_script.sh: |
-    #!/usr/bin/env sh
+    #!/usr/bin/env bash
 
     SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-    if [ ! -f "${SCRIPT_DIR}/custom_script.sh" ]; then
+    if [[ ! -f "${SCRIPT_DIR}/custom_script.sh" ]]; then
       echo "No custom script provided. Exiting..."
       exit 0
     fi
 
     set -e
 
+    echo -n "** Running as "
     whoami
 
     echo "Executing custom script in database: ${DATABASE_DATABASE}"

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 if [[ -z "${SCHEMAS}" ]]; then
   echo "No schemas provided. Exiting..."
@@ -29,6 +29,7 @@ SCHEMA_FILE="/tmp/db2-schema.sql"
 
 SCHEMA_LIST=$(echo "${SCHEMAS}" | tr ";" "\n")
 
+echo -n "** Running as "
 whoami
 
 echo "Creating schema(s) in database: ${DATABASE_DATABASE}"
