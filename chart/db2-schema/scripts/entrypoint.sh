@@ -15,8 +15,6 @@ echo "Done sleeping"
 
 set -e
 
-su - db2inst1
-
-"${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
-"${SCRIPT_DIR}/create_schemas.sh"
-"${SCRIPT_DIR}/run_script.sh"
+su - db2inst1 -c "${SCRIPT_DIR}/connect_remote_database.sh '${DATABASE_HOST}' '${DATABASE_PORT}' '${DATABASE_DATABASE}' '${DATABASE_USERNAME}' '${DATABASE_PASSWORD}'"
+su - db2inst1 -c "${SCRIPT_DIR}/create_schemas.sh"
+su - db2inst1 -c "${SCRIPT_DIR}/run_script.sh"
