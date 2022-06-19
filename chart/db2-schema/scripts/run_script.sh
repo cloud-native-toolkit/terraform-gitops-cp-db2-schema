@@ -2,6 +2,8 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
+DATABASE_DATABASE="$1"
+
 if [[ ! -f "${SCRIPT_DIR}/custom_script.sh" ]]; then
   echo "No custom script provided. Exiting..."
   exit 0

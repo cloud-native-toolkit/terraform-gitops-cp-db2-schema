@@ -28,6 +28,8 @@ data:
   create_schemas.sh: |
     #!/usr/bin/env bash
 
+    SCHEMAS="$1"
+
     if [[ -z "${SCHEMAS}" ]]; then
       echo "No schemas provided. Exiting..."
       exit 0
@@ -93,13 +95,13 @@ data:
 
     set -e
 
-    su - db2inst1 -c "${SCRIPT_DIR}/connect_remote_database.sh '${DATABASE_HOST}' '${DATABASE_PORT}' '${DATABASE_DATABASE}' '${DATABASE_USERNAME}' '${DATABASE_PASSWORD}'"
-    su - db2inst1 -c "${SCRIPT_DIR}/create_schemas.sh"
-    su - db2inst1 -c "${SCRIPT_DIR}/run_script.sh"
+    su - db2inst1 -c "${SCRIPT_DIR}/run_database_commands.sh"
   run_script.sh: |
     #!/usr/bin/env bash
 
     SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
+
+    DATABASE_DATABASE="$1"
 
     if [[ ! -f "${SCRIPT_DIR}/custom_script.sh" ]]; then
       echo "No custom script provided. Exiting..."

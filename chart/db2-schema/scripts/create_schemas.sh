@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+SCHEMAS="$1"
+
 if [[ -z "${SCHEMAS}" ]]; then
   echo "No schemas provided. Exiting..."
   exit 0
