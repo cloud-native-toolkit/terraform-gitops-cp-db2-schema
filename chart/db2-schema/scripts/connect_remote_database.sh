@@ -15,4 +15,5 @@ echo "Creating connection to database: name=${DATABASE_DATABASE}, ${DATABASE_HOS
 
 db2 catalog tcpip node prvsndb2 remote "${DATABASE_HOST}" server "${DATABASE_PORT}" SECURITY SSL;
 db2 catalog db "${DATABASE_DATABASE}" as "${DATABASE_DATABASE}" at node prvsndb2;
+db2 terminate;
 db2 connect to "${DATABASE_DATABASE}" user "${DATABASE_USERNAME}" using "${DATABASE_PASSWORD}";
