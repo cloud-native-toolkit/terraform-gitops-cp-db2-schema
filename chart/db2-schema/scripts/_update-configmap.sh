@@ -11,6 +11,7 @@ oc create configmap tmp \
   --from-file=${SCRIPT_DIR}/create_schemas.sh \
   --from-file=${SCRIPT_DIR}/run_script.sh \
   --from-file=${SCRIPT_DIR}/connect_remote_database.sh \
+  --from-file=${SCRIPT_DIR}/run_database_commands.sh \
   --dry-run=client \
   -o yaml | \
 yq eval 'del(.apiVersion) | del(.kind) | del(.metadata)' - >> "${TEMPLATE_DIR}/configmap.yaml"
