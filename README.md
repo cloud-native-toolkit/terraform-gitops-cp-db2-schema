@@ -1,19 +1,28 @@
 # Starter kit for a Terraform GitOps module
 Module to provision a gitops repo with the resources to create users and schema on a provisioned DB2 in Cloud Pak for Data.
 
+The pre-requisite for the module is a secret created in the cluster that contains the connectivity information for the DB2 instance. For the module, the DB2 instance can be running inside the cluster or elsewhere. That information is provided to the module using several variables:
+
+- **namespace** - the namespace where the secret has been provisioned
+- **secret_name** - the name of the secret that has been provisioned in the cluster
+- **host_key** - the key that contains the host information in the secret
+- **port_key** - the key that contains the port information in the secret
+- **database_key** - the key that contains the database name information in the secret
+- **username_key** - the key that contains the username information in the secret
+- **password_key** - the key that contains the password information in the secret
+
 ## Software dependencies
 
 The module depends on the following software components:
 
 ### Command-line tools
 
-- terraform - v12
-- kubectl - used in `scripts/create-secrets.sh` to generate the secret in a yaml file
+- terraform - v0.15
 
 ### Terraform providers
 
-- IBM Cloud provider >= 1.5.3
-- Helm provider >= 1.1.1 (provided by Terraform)
+- GitOps - github.com/cloud-native-toolkit/terraform-tools-gitops
+- Database Secret - github.com/cloud-native-toolkit/automation-modules#database-secret
 
 ## Module dependencies
 
