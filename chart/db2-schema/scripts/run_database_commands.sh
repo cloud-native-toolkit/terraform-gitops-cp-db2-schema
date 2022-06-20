@@ -31,4 +31,4 @@ require_env_var "DATABASE_PASSWORD"
 
 "${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
 "${SCRIPT_DIR}/create_schemas.sh" "${SCHEMAS}"
-"${SCRIPT_DIR}/run_script.sh" "${DATABASE_DATABASE}"
+"${SCRIPT_DIR}/run_script.sh" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
