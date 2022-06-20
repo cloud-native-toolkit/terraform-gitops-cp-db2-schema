@@ -75,3 +75,44 @@ variable "kubeseal_namespace" {
 
 variable "cp_entitlement_key" {
 }
+
+variable "cpd_namespace" {
+  type        = string
+  description = "Namespace for cpd services"
+  default = "gitops-cp4d-instance"
+}
+
+variable "database_name" {
+  type        = string
+  description = "Name of database created by DB2 instance"
+  default     = "OMSDB"
+}
+
+variable "pvcsize" {
+  type        = string
+  description = "The size of the pvc that needs to be created for db2"
+  default     = 10
+}
+
+variable "storageClass" {
+  type        = string
+  description = "The RWX/RWO Storage Class needed to create db2"
+  default     = "portworx-db2-rwx-sc"
+}
+
+resource null_resource write_namespace {
+  provisioner "local-exec" {
+    command = "echo -n '${var.cpd_namespace}' > .cpd_namespace"
+  }
+
+}
+
+variable "region" {
+  default = "us-south"
+}
+
+variable "resource_group_name" {
+}
+
+variable "ibmcloud_api_key" {
+}

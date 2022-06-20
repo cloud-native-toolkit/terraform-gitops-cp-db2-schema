@@ -63,11 +63,6 @@ variable "git_credentials" {
   sensitive   = true
 }
 
-variable "namespace" {
-  type        = string
-  description = "The namespace where the application should be deployed"
-}
-
 variable "kubeseal_cert" {
   type        = string
   description = "The certificate/public key used to encrypt the sealed secrets"
@@ -78,4 +73,62 @@ variable "server_name" {
   type        = string
   description = "The name of the server"
   default     = "default"
+}
+
+variable "namespace" {
+  type        = string
+  description = "Namespace where the database secret has been provisioned"
+}
+
+variable "secret_name" {
+  type        = string
+  description = "The name of the secret that contains the credentials for the database"
+}
+
+variable "username_key" {
+  type        = string
+  description = "The key in the provided secret used for the username"
+  default     = "username"
+}
+
+variable "password_key" {
+  type        = string
+  description = "The key in the provided secret used for the password"
+  default     = "password"
+}
+
+variable "host_key" {
+  type        = string
+  description = "The key in the provided secret used for the host"
+  default     = "host"
+}
+
+variable "port_key" {
+  type        = string
+  description = "The key in the provided secret used for the port"
+  default     = "port"
+}
+
+variable "database_name_key" {
+  type        = string
+  description = "The key in the provided secret used for the database name"
+  default     = "database"
+}
+
+variable "schemas" {
+  type        = list(string)
+  description = "The list of schemas that should be added to the database"
+  default     = []
+}
+
+variable "customScriptFile" {
+  type        = string
+  description = "The path to the file containing the custom script that should be run against the database. The script can either be provided in a file or as a string in the `customScript` variable."
+  default     = ""
+}
+
+variable "customScript" {
+  type        = string
+  description = "The contents of the custom script that should be run against the database. The script can either be provided as a string or in a file via the `customScriptFile` variable."
+  default     = ""
 }

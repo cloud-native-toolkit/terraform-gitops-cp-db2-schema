@@ -1,6 +1,6 @@
-name: gitops-cp-db2-schema
+name: gitops-db2-schema
 type: gitops
-description: Module to populate a gitops repo with the resources to provision cp-db2-schema
+description: Module to populate a gitops repo with the resources to configure a DB2 instance with schemas and/or running a script
 tags:
   - tools
   - gitops
@@ -14,10 +14,9 @@ versions:
         refs:
           - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
             version: '>= 1.1.0'
-      - id: namespace
-        refs:
-          - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
-            version: '>= 1.0.0'
+      - id: database-secret
+        interface: github.com/cloud-native-toolkit/automation-modules#database-secret
+        refs: []
     variables:
       - name: gitops_config
         moduleRef:
@@ -31,12 +30,35 @@ versions:
         moduleRef:
           id: gitops
           output: server_name
-      - name: namespace
-        moduleRef:
-          id: namespace
-          output: name
       - name: kubeseal_cert
         moduleRef:
           id: gitops
           output: sealed_secrets_cert
-softwareProvider: ibm-cp
+      - name: namespace
+        moduleRef:
+          id: database-secret
+          output: namespace
+      - name: secret_name
+        moduleRef:
+          id: database-secret
+          output: secret_name
+      - name: host_key
+        moduleRef:
+          id: database-secret
+          output: host_key
+      - name: port_key
+        moduleRef:
+          id: database-secret
+          output: port_key
+      - name: database_name_key
+        moduleRef:
+          id: database-secret
+          output: database_key
+      - name: username_key
+        moduleRef:
+          id: database-secret
+          output: username_key
+      - name: password_key
+        moduleRef:
+          id: database-secret
+          output: password_key

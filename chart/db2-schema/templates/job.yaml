@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "db2-schema.fullname" . }}
+  labels:
+  {{- include "db2-schema.labels" . | nindent 4 }}
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ include "db2-schema.fullname" . }}
+            defaultMode: 0777
+      serviceAccountName: {{ include "db2-schema.serviceAccountName" . }}
+      containers:
+        - name: job
+          image: {{ printf "%s:%s" .Values.image.repository (include "db2-schema.imageTag" .) | quote }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /scripts
+              name: scripts
+          env:
+            - name: LICENSE
+              value: accept
+            - name: SCHEMAS
+              value: {{ join ";" .Values.schemas }}
+            - name: DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{ default "host" .Values.secret.host_key }}
+            - name: DATABASE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{ default "port" .Values.secret.port_key }}
+            - name: DATABASE_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{ default "database" .Values.secret.database_key }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{ default "username" .Values.secret.username_key }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default "db2-credentials" .Values.secret.name }}
+                  key: {{ default "password" .Values.secret.password_key }}
+          command:
+            - /scripts/entrypoint.sh
