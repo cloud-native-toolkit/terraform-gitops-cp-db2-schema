@@ -1,9 +1,185 @@
-name: gitops-cp-db2-schema
+name: gitops-db2-schema
 type: gitops
-description: Module to populate a gitops repo with the resources to provision cp-db2-schema
+description: >-
+  Module to populate a gitops repo with the resources to configure a DB2
+  instance with schemas and/or running a script
 tags:
   - tools
   - gitops
-versions: []
+versions:
+  - platforms:
+      - kubernetes
+      - ocp3
+      - ocp4
+    dependencies:
+      - id: gitops
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
+            version: '>= 1.1.0'
+      - id: database-secret
+        interface: github.com/cloud-native-toolkit/automation-modules#database-secret
+        refs: []
+    variables:
+      - name: gitops_config
+        type: |-
+          object({
+              boostrap = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              infrastructure = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              services = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              applications = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+            })
+        description: Config information regarding the gitops repo structure
+        moduleRef:
+          id: gitops
+          output: gitops_config
+      - name: git_credentials
+        type: |-
+          list(object({
+              repo = string
+              url = string
+              username = string
+              token = string
+            }))
+        description: The credentials for the gitops repo(s)
+        sensitive: true
+        moduleRef:
+          id: gitops
+          output: git_credentials
+      - name: kubeseal_cert
+        type: string
+        description: The certificate/public key used to encrypt the sealed secrets
+        default: ''
+        moduleRef:
+          id: gitops
+          output: sealed_secrets_cert
+      - name: server_name
+        type: string
+        description: The name of the server
+        default: default
+        moduleRef:
+          id: gitops
+          output: server_name
+      - name: namespace
+        type: string
+        description: Namespace where the database secret has been provisioned
+        moduleRef:
+          id: database-secret
+          output: namespace
+      - name: secret_name
+        type: string
+        description: The name of the secret that contains the credentials for the database
+        moduleRef:
+          id: database-secret
+          output: secret_name
+      - name: username_key
+        type: string
+        description: The key in the provided secret used for the username
+        default: username
+        moduleRef:
+          id: database-secret
+          output: username_key
+      - name: password_key
+        type: string
+        description: The key in the provided secret used for the password
+        default: password
+        moduleRef:
+          id: database-secret
+          output: password_key
+      - name: host_key
+        type: string
+        description: The key in the provided secret used for the host
+        default: host
+        moduleRef:
+          id: database-secret
+          output: host_key
+      - name: port_key
+        type: string
+        description: The key in the provided secret used for the port
+        default: port
+        moduleRef:
+          id: database-secret
+          output: port_key
+      - name: database_name_key
+        type: string
+        description: The key in the provided secret used for the database name
+        default: database
+        moduleRef:
+          id: database-secret
+          output: database_key
+      - name: schemas
+        type: list(string)
+        description: The list of schemas that should be added to the database
+        default: []
+      - name: customScriptFile
+        type: string
+        description: >-
+          The path to the file containing the custom script that should be run
+          against the database. The script can either be provided in a file or
+          as a string in the `customScript` variable.
+        default: ''
+      - name: customScript
+        type: string
+        description: >-
+          The contents of the custom script that should be run against the
+          database. The script can either be provided as a string or in a file
+          via the `customScriptFile` variable.
+        default: ''
+    version: v1.0.0
+    outputs:
+      - name: name
+        description: The name of the module
+      - name: branch
+        description: The branch where the module config has been placed
+      - name: namespace
+        description: The namespace where the module will be deployed
+      - name: server_name
+        description: The server where the module will be deployed
+      - name: layer
+        description: The layer where the module is deployed
+      - name: type
+        description: The type of module where the module is deployed
 softwareProvider: ibm-cp
 id: github.com/cloud-native-toolkit/terraform-gitops-cp-db2-schema
