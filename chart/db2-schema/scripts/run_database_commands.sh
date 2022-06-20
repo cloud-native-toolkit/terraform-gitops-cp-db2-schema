@@ -2,6 +2,13 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
+DATABASE_HOST="$1"
+DATABASE_PORT="$2"
+DATABASE_DATABASE="$3"
+DATABASE_USERNAME="$4"
+DATABASE_PASSWORD="$5"
+SCHEMAS="$6"
+
 require_env_var() {
   local var_name="$1"
 
@@ -11,7 +18,7 @@ require_env_var() {
   fi
 
   if [[ -z "${!var_name}" ]]; then
-    echo "${var_name} must be provided as an environment variable" >&2
+    echo "${var_name} must be provided" >&2
     exit 1
   fi
 }
