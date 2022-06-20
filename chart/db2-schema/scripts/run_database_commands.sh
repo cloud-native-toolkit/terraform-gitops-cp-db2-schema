@@ -2,11 +2,11 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-DATABASE_HOST="$1"
-DATABASE_PORT="$2"
-DATABASE_DATABASE="$3"
-DATABASE_USERNAME="$4"
-DATABASE_PASSWORD="$5"
+export DATABASE_HOST="$1"
+export DATABASE_PORT="$2"
+export DATABASE_DATABASE="$3"
+export DATABASE_USERNAME="$4"
+export DATABASE_PASSWORD="$5"
 SCHEMAS="$6"
 
 require_env_var() {
@@ -30,5 +30,5 @@ require_env_var "DATABASE_USERNAME"
 require_env_var "DATABASE_PASSWORD"
 
 "${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
-"${SCRIPT_DIR}/create_schemas.sh" "${SCHEMAS}"
+"${SCRIPT_DIR}/create_schemas.sh"  "${SCHEMAS}"
 "${SCRIPT_DIR}/run_script.sh" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"

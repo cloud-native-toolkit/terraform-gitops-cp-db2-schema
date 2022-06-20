@@ -16,10 +16,6 @@ set -e
 echo -n "** Running as "
 whoami
 
-echo "Logging into database ${DATABASE_DATABASE} as user ${DATABASE_USERNAME}"
-
-db2 connect to "${DATABASE_DATABASE}" user "${DATABASE_USERNAME}" using "${DATABASE_PASSWORD}";
-
 echo "Executing custom script in database: ${DATABASE_DATABASE}"
 
-"${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}"
+"${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"

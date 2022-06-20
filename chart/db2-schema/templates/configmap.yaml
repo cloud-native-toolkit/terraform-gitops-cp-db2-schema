@@ -49,8 +49,6 @@ data:
       fi
     }
 
-    require_env_var "DATABASE_HOST"
-    require_env_var "DATABASE_PORT"
     require_env_var "DATABASE_DATABASE"
     require_env_var "DATABASE_USERNAME"
     require_env_var "DATABASE_PASSWORD"
@@ -64,20 +62,30 @@ data:
 
     echo "Creating schema(s) in database: ${DATABASE_DATABASE}"
 
-    for schema in $SCHEMA_LIST; do
-      echo "create schema '${schema}';" >> "${SCHEMA_FILE}"
-      echo "grant dbadm on database to user '${schema}';" >> "${SCHEMA_FILE}"
-    done
+    if [[ -n "${DATABASE_USERNAME}" ]] && [[ -n "${DATABASE_PASSWORD}" ]]; then
+      db2 connect to "${DATABASE_DATABASE}" user "${DATABASE_USERNAME}" using "${DATABASE_PASSWORD}"
+    else
+      db2 connect to "${DATABASE_DATABASE}"
+    fi
 
-    db2 -tf "${SCHEMA_FILE}"
+    set -x
+
+    for schema in $SCHEMA_LIST; do
+      db2 create schema "${schema}"
+      db2 grant dbadm on database to user "${schema}"
+    done
   entrypoint.sh: |
     #!/usr/bin/env bash
 
     SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-    dnf install procps -y
+    if ! command -v ps 1> /dev/null 2> /dev/null; then
+      echo "ps command not found. Installing..."
+      dnf install procps -y 1> /dev/null
+    fi
 
-    /var/db2_setup/lib/setup_db2_instance.sh &
+    echo "Starting db2 process"
+    /var/db2_setup/lib/setup_db2_instance.sh 2>&1 > /tmp/db2.log &
 
     count=0
     while [[ "${count}" -lt 6 ]]; do
@@ -86,14 +94,14 @@ data:
         break
       fi
 
-      echo "Sleeping for 60 seconds"
+      echo "  Waiting for db2 process to start. Sleeping for 60 seconds."
       count=$((count + 1))
       sleep 60
     done
 
-    echo "DB2 is ready. Running commands..."
-
     set -e
+
+    echo "DB2 is ready. Running commands..."
 
     su - db2inst1 -c "${SCRIPT_DIR}/run_database_commands.sh '${DATABASE_HOST}' '${DATABASE_PORT}' '${DATABASE_DATABASE}' '${DATABASE_USERNAME}' '${DATABASE_PASSWORD}' '${SCHEMAS}'"
   run_database_commands.sh: |
@@ -101,11 +109,11 @@ data:
 
     SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-    DATABASE_HOST="$1"
-    DATABASE_PORT="$2"
-    DATABASE_DATABASE="$3"
-    DATABASE_USERNAME="$4"
-    DATABASE_PASSWORD="$5"
+    export DATABASE_HOST="$1"
+    export DATABASE_PORT="$2"
+    export DATABASE_DATABASE="$3"
+    export DATABASE_USERNAME="$4"
+    export DATABASE_PASSWORD="$5"
     SCHEMAS="$6"
 
     require_env_var() {
@@ -129,7 +137,7 @@ data:
     require_env_var "DATABASE_PASSWORD"
 
     "${SCRIPT_DIR}/connect_remote_database.sh" "${DATABASE_HOST}" "${DATABASE_PORT}" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
-    "${SCRIPT_DIR}/create_schemas.sh" "${SCHEMAS}"
+    "${SCRIPT_DIR}/create_schemas.sh"  "${SCHEMAS}"
     "${SCRIPT_DIR}/run_script.sh" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
   run_script.sh: |
     #!/usr/bin/env bash
@@ -150,13 +158,9 @@ data:
     echo -n "** Running as "
     whoami
 
-    echo "Logging into database ${DATABASE_DATABASE} as user ${DATABASE_USERNAME}"
-
-    db2 connect to "${DATABASE_DATABASE}" user "${DATABASE_USERNAME}" using "${DATABASE_PASSWORD}";
-
     echo "Executing custom script in database: ${DATABASE_DATABASE}"
 
-    "${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}"
+    "${SCRIPT_DIR}/custom_script.sh" "${DATABASE_DATABASE}" "${DATABASE_USERNAME}" "${DATABASE_PASSWORD}"
   {{- if .Values.customScript }}
   custom_script.sh: |
     {{- .Values.customScript | nindent 4 }}

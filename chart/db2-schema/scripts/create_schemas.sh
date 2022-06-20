@@ -21,8 +21,6 @@ require_env_var() {
   fi
 }
 
-require_env_var "DATABASE_HOST"
-require_env_var "DATABASE_PORT"
 require_env_var "DATABASE_DATABASE"
 require_env_var "DATABASE_USERNAME"
 require_env_var "DATABASE_PASSWORD"
@@ -36,9 +34,15 @@ whoami
 
 echo "Creating schema(s) in database: ${DATABASE_DATABASE}"
 
-for schema in $SCHEMA_LIST; do
-  echo "create schema '${schema}';" >> "${SCHEMA_FILE}"
-  echo "grant dbadm on database to user '${schema}';" >> "${SCHEMA_FILE}"
-done
+if [[ -n "${DATABASE_USERNAME}" ]] && [[ -n "${DATABASE_PASSWORD}" ]]; then
+  db2 connect to "${DATABASE_DATABASE}" user "${DATABASE_USERNAME}" using "${DATABASE_PASSWORD}"
+else
+  db2 connect to "${DATABASE_DATABASE}"
+fi
 
-db2 -tf "${SCHEMA_FILE}"
+set -x
+
+for schema in $SCHEMA_LIST; do
+  db2 create schema "${schema}"
+  db2 grant dbadm on database to user "${schema}"
+done
